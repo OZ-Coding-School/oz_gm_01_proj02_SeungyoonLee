@@ -106,5 +106,4 @@ namespace LunarCube.GameManager
         }
 #endif
     }
-
 }
