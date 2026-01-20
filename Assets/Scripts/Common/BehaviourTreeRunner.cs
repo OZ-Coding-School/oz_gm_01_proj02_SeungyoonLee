@@ -2,7 +2,12 @@ using UnityEngine;
 
 public class BehaviourTreeRunner : MonoBehaviour
 {
-    [field: SerializeField] public LunarCube.BehaviourTree.INode Root { get; private set; }
+    [field: SerializeField] public BehaviourTreeObject target { get; private set; }
+
+    private void OnEnable()
+    {
+        target.root.Initialize(this);
+    }
 
     private void FixedUpdate()
     {
@@ -11,7 +16,7 @@ public class BehaviourTreeRunner : MonoBehaviour
 
     private LunarCube.BehaviourTree.INode.State Tick()
     {
-        if (null != Root) return Root.Tick();
+        if (null != target.root) return target.root.Tick();
         else return LunarCube.BehaviourTree.INode.State.Failure;
     }
 }
