@@ -1,13 +1,10 @@
-using Lua;
-using Lua.Unity;
-using LunarCube.GameManager;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace LunarCube.BehaviourTree
 {
-
     public interface INode
     {
         public enum State
@@ -17,34 +14,34 @@ namespace LunarCube.BehaviourTree
             Success
         }
 
-        public void Initialize();
+        public void Initialize(BehaviourTreeRunner runner);
         public State Tick();
     }
 
     [Serializable]
     public class Root : INode
     {
-        [SerializeField] private INode node;
+        [SerializeReference] private INode node;
 
-        public void Initialize()
+        public void Initialize(BehaviourTreeRunner runner)
         {
-            node.Initialize();
+            node.Initialize(runner);
         }
 
         public INode.State Tick()
         {
-            return node.Tick();
+            return node?.Tick() ?? INode.State.Failure;
         }
     }
 
     [Serializable]
     public abstract class Compositor : INode
     {
-        [SerializeField] protected List<INode> nodes;
+        [SerializeReference] protected List<INode> nodes;
 
-        public void Initialize()
+        public virtual void Initialize(BehaviourTreeRunner runner)
         {
-            foreach (INode node in nodes) node.Initialize();
+            foreach (INode node in nodes ?? Enumerable.Empty<INode>()) node.Initialize(runner);
         }
 
         public abstract INode.State Tick();
@@ -55,9 +52,9 @@ namespace LunarCube.BehaviourTree
     {
         public override INode.State Tick()
         {
-            foreach (INode node in nodes)
+            foreach (INode node in nodes ?? Enumerable.Empty<INode>())
             {
-                INode.State state = node.Tick();
+                INode.State state = node?.Tick() ?? INode.State.Failure;
                 if (INode.State.Failure != state) return state;
             }
             return INode.State.Failure;
@@ -69,9 +66,9 @@ namespace LunarCube.BehaviourTree
     {
         public override INode.State Tick()
         {
-            foreach (INode node in nodes)
+            foreach (INode node in nodes ?? Enumerable.Empty<INode>())
             {
-                INode.State state = node.Tick();
+                INode.State state = node?.Tick() ?? INode.State.Failure;
                 if (INode.State.Success != state) return state;
             }
             return INode.State.Success;
@@ -81,22 +78,29 @@ namespace LunarCube.BehaviourTree
     [Serializable]
     public class RandomPick : Compositor
     {
-        Unity.Mathematics.Random random = new Unity.Mathematics.Random((uint)System.DateTime.Now.Ticks);
+        Unity.Mathematics.Random random;
+        public override void Initialize(BehaviourTreeRunner runner)
+        {
+            base.Initialize(runner);
+            random = new Unity.Mathematics.Random((uint)DateTime.Now.Ticks);
+        }
         public override INode.State Tick()
         {
+            if (null == nodes) return INode.State.Failure;
+
             int index = random.NextInt(0, nodes.Count - 1);
-            return nodes[index].Tick();
+            return nodes[index]?.Tick() ?? INode.State.Failure;
         }
     }
 
     [Serializable]
     public abstract class Modifier : INode
     {
-        [SerializeField] protected INode node;
+        [SerializeReference] protected INode node;
 
-        public void Initialize()
+        public virtual void Initialize(BehaviourTreeRunner runner)
         {
-            node.Initialize();
+            node.Initialize(runner);
         }
 
         public abstract INode.State Tick();
@@ -107,7 +111,9 @@ namespace LunarCube.BehaviourTree
     {
         public override INode.State Tick()
         {
-            return node.Tick() switch
+            if (null == node) return INode.State.Failure;
+
+            else return node.Tick() switch
             {
                 INode.State.Failure => INode.State.Success,
                 INode.State.Running => INode.State.Running,
@@ -121,6 +127,8 @@ namespace LunarCube.BehaviourTree
     {
         public override INode.State Tick()
         {
+            if (null == node) return INode.State.Failure;
+
             node.Tick();
             return INode.State.Success;
         }
@@ -131,7 +139,9 @@ namespace LunarCube.BehaviourTree
     {
         public override INode.State Tick()
         {
-            return node.Tick() switch
+            if (null == node) return INode.State.Failure;
+
+            else return node.Tick() switch
             {
                 INode.State.Running => INode.State.Running,
                 _                   => INode.State.Success,
@@ -144,6 +154,8 @@ namespace LunarCube.BehaviourTree
     {
         public override INode.State Tick()
         {
+            if (null == node) return INode.State.Failure;
+
             node.Tick();
             return INode.State.Failure;
         }
@@ -154,7 +166,9 @@ namespace LunarCube.BehaviourTree
     {
         public override INode.State Tick()
         {
-            return node.Tick() switch
+            if (null == node) return INode.State.Failure;
+
+            else return node.Tick() switch
             {
                 INode.State.Running => INode.State.Running,
                 _                   => INode.State.Failure,
@@ -165,45 +179,94 @@ namespace LunarCube.BehaviourTree
     [Serializable]
     public class Repeater : Modifier
     {
-        [field: SerializeField] public int Count { get; private set; }
+        [field: Min(1)] [field: SerializeField] public int Count { get; private set; }
+        private int iteration;
+        private bool isEverFailed;
+        public override void Initialize(BehaviourTreeRunner runner)
+        {
+            base.Initialize(runner);
+            iteration = 0;
+            isEverFailed = false;
+        }
+
         public override INode.State Tick()
         {
-            return node.Tick() switch
+            if (null == node) return INode.State.Failure;
+            if (Count <= 0) return INode.State.Success;
+
+            INode.State state = node.Tick();
+            if (state == INode.State.Failure) isEverFailed = true;
+
+            switch (state)
             {
-                INode.State.Running => INode.State.Running,
-                _                   => INode.State.Failure,
-            };
+                case INode.State.Running:
+                    return INode.State.Running;
+                case INode.State.Success:
+                case INode.State.Failure:
+                    iteration++;
+                    if (iteration >= Count)
+                    {
+                        iteration = 0;
+                        return isEverFailed ? INode.State.Failure : INode.State.Success;
+                    }
+                    else return INode.State.Running;
+                default:
+                    return INode.State.Failure;
+            }
         }
     }
 
     [Serializable]
-    public class Evaluator : INode
+    public class ConditionalRepeater : Modifier
     {
-        [field: SerializeField] public LuaAsset Script { get; private set; }
-        LuaFunction func; // TODO: currently no arguments expected. need change
+        [Tooltip("'Conditional Node' would be executed when the 'Node' returned success.")]
+        [SerializeReference] private INode conditionalNode;
 
-        public void Initialize()
+        public override INode.State Tick()
         {
-            LuaState state = GameManager.GameManager.Instance.GetService<LuaRunnerService>().State;
-            var results = state.DoFileAsync("lua2cs.lua").Result;
-            if (1 == results.Length && results[0].TryRead(out LuaFunction returnVal)) func = returnVal;
+            INode.State state = node?.Tick() ?? INode.State.Failure;
+            switch (state)
+            {
+                case INode.State.Running:
+                    return INode.State.Running;
+                case INode.State.Success:
+                    return conditionalNode?.Tick() ?? INode.State.Failure;
+                case INode.State.Failure:
+                    return INode.State.Success;
+                default:
+                    return INode.State.Failure;
+            }
+        }
+    }
+
+    [Serializable]
+    public class NestedTree : INode
+    {
+        [field: SerializeField] private BehaviourTreeObject Nested;
+        public void Initialize(BehaviourTreeRunner runner)
+        {
+            Nested?.root?.Initialize(runner);
         }
 
         public INode.State Tick()
         {
-            if (null == func) return INode.State.Failure;
-            LuaState state = GameManager.GameManager.Instance.GetService<LuaRunnerService>().State;
-            var results = state.CallAsync(func, ReadOnlySpan<LuaValue>.Empty).Result;
-            if (1 == results.Length && results[0].TryRead(out int returnVal))
-            {
-                return returnVal switch
-                {
-                    0 => INode.State.Success,
-                    1 => INode.State.Running,
-                    _ => INode.State.Failure,
-                };
-            }
-            else return INode.State.Failure;
+            return Nested?.root?.Tick() ?? INode.State.Failure;
+        }
+    }
+
+    [Serializable]
+    public class Leaf : INode
+    {
+        [field: SerializeField] private BehaviourTreeActionObject actionObject;
+        BehaviourTreeRunner runner;
+        public void Initialize(BehaviourTreeRunner runner)
+        {
+            this.runner = runner;
+        }
+
+        public INode.State Tick()
+        {
+            return actionObject?.Invoke(runner) ?? INode.State.Failure;
         }
     }
 
