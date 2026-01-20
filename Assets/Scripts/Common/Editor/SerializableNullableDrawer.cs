@@ -11,17 +11,26 @@ public class SerializableNullableDrawer : PropertyDrawer
 
         float checkBoxSize = EditorGUIUtility.singleLineHeight;
 
-        Rect checkBoxRect = new Rect(position.x, position.y, checkBoxSize, position.height);
-        Rect fieldRect =
-            new Rect(
-                position.x + checkBoxSize,
-                position.y,
-                position.width - checkBoxSize,
-                position.height);
+        Rect contentPosition = EditorGUI.PrefixLabel(position, label);
 
-        hasValueProperty.boolValue = EditorGUI.Toggle(checkBoxRect, hasValueProperty.boolValue);
-        if (hasValueProperty.boolValue) EditorGUI.PropertyField(fieldRect, valueProperty, label, true);
-        else EditorGUI.LabelField(fieldRect, label.text, "<null>");
+        Rect checkBoxPosition = new Rect(contentPosition.x,
+                                         contentPosition.y,
+                                         checkBoxSize,
+                                         contentPosition.height);
+        Rect fieldPosition =
+            new Rect(
+                contentPosition.x + checkBoxSize,
+                contentPosition.y,
+                contentPosition.width - checkBoxSize,
+                contentPosition.height);
+
+
+        int originalIndentLevel = EditorGUI.indentLevel;
+        EditorGUI.indentLevel = 0;
+        hasValueProperty.boolValue = EditorGUI.Toggle(checkBoxPosition, hasValueProperty.boolValue);
+        if (hasValueProperty.boolValue) EditorGUI.PropertyField(fieldPosition, valueProperty, GUIContent.none, true);
+        else EditorGUI.LabelField(fieldPosition, "<null>");
+        EditorGUI.indentLevel = originalIndentLevel;
     }
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)

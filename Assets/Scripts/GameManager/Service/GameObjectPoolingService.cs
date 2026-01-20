@@ -2,24 +2,25 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 namespace LunarCube.GameManager
 {
     [Serializable]
-    public class PoolingServiceConfig : ServiceConfig<PoolingService>
+    public class GameObjectPoolingServiceConfig : ServiceConfig<GameObjectPoolingService>
     {
         [field: SerializeField] public SerializableNullable<int> DefaultInitialCount { get; private set; }
         [field: SerializeField] public SerializableNullable<int> DefaultCapacity { get; private set; }
     }
 
-    public class PoolingService : MonoBehaviour, IService
+    public class GameObjectPoolingService : MonoBehaviour, IService
     {
         public int DefaultInitialCount { get; private set; }
         public int DefaultCapacity { get; private set; }
 
         public void Configure(IServiceConfig iConfig)
         {
-            PoolingServiceConfig config = iConfig as PoolingServiceConfig;
+            GameObjectPoolingServiceConfig config = iConfig as GameObjectPoolingServiceConfig;
             if (config.DefaultInitialCount.HasValue)    DefaultInitialCount = config.DefaultInitialCount.Value;
             if (config.DefaultCapacity.HasValue)        DefaultCapacity     = config.DefaultCapacity.Value;
         }

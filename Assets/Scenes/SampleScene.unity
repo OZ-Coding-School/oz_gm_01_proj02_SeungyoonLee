@@ -1379,6 +1379,26 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7590496394241917417, guid: f637a527ed6f9974e8fd64daca5df558, type: 3}
+      propertyPath: 'managedReferences[7749938925985595611]'
+      value: Assembly-CSharp LunarCube.GameManager.GameObjectPoolingServiceConfig
+      objectReference: {fileID: 0}
+    - target: {fileID: 7590496394241917417, guid: f637a527ed6f9974e8fd64daca5df558, type: 3}
+      propertyPath: managedReferences[1001].<Requirement>k__BackingField
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7590496394241917417, guid: f637a527ed6f9974e8fd64daca5df558, type: 3}
+      propertyPath: managedReferences[1001].<DefaultCapacity>k__BackingField.value
+      value: 32
+      objectReference: {fileID: 0}
+    - target: {fileID: 7590496394241917417, guid: f637a527ed6f9974e8fd64daca5df558, type: 3}
+      propertyPath: managedReferences[1001].<DefaultCapacity>k__BackingField.hasValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7590496394241917417, guid: f637a527ed6f9974e8fd64daca5df558, type: 3}
+      propertyPath: managedReferences[1001].<DefaultInitialCount>k__BackingField.value
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7590496394241917417, guid: f637a527ed6f9974e8fd64daca5df558, type: 3}
       propertyPath: managedReferences[7749938786236629243].<Requirement>k__BackingField
       value: 2
       objectReference: {fileID: 0}
@@ -1391,20 +1411,44 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7590496394241917417, guid: f637a527ed6f9974e8fd64daca5df558, type: 3}
+      propertyPath: managedReferences[7749938925985595611].<Requirement>k__BackingField
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7590496394241917417, guid: f637a527ed6f9974e8fd64daca5df558, type: 3}
+      propertyPath: managedReferences[1001].<DefaultInitialCount>k__BackingField.hasValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7590496394241917417, guid: f637a527ed6f9974e8fd64daca5df558, type: 3}
       propertyPath: managedReferences[7749938786236629243].<DefaultCapacity>k__BackingField.value
       value: 64
+      objectReference: {fileID: 0}
+    - target: {fileID: 7590496394241917417, guid: f637a527ed6f9974e8fd64daca5df558, type: 3}
+      propertyPath: managedReferences[7749938925985595611].<DefaultCapacity>k__BackingField.value
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7590496394241917417, guid: f637a527ed6f9974e8fd64daca5df558, type: 3}
       propertyPath: managedReferences[7749938786236629243].<DefaultCapacity>k__BackingField.hasValue
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7590496394241917417, guid: f637a527ed6f9974e8fd64daca5df558, type: 3}
+      propertyPath: managedReferences[7749938925985595611].<DefaultCapacity>k__BackingField.hasValue
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7590496394241917417, guid: f637a527ed6f9974e8fd64daca5df558, type: 3}
       propertyPath: managedReferences[7749938786236629243].<DefaultInitialCount>k__BackingField.value
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7590496394241917417, guid: f637a527ed6f9974e8fd64daca5df558, type: 3}
+      propertyPath: managedReferences[7749938925985595611].<DefaultInitialCount>k__BackingField.value
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7590496394241917417, guid: f637a527ed6f9974e8fd64daca5df558, type: 3}
       propertyPath: managedReferences[7749938786236629243].<DefaultInitialCount>k__BackingField.hasValue
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7590496394241917417, guid: f637a527ed6f9974e8fd64daca5df558, type: 3}
+      propertyPath: managedReferences[7749938925985595611].<DefaultInitialCount>k__BackingField.hasValue
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
