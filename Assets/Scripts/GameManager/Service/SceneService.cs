@@ -4,20 +4,20 @@ using UnityEngine.SceneManagement;
 
 namespace LunarCube.GameManager
 {
+    [Serializable]
+    public class SceneServiceConfig : ServiceConfig<SceneService>
+    {
+        [field: SerializeField] public string LoadingScreenName { get; set; }
+    }
+
     public class SceneService : MonoBehaviour, IService
     {
-        [Serializable]
-        public class SceneServiceConfig : ServiceConfig<SceneService>
-        {
-            [field: SerializeField] public string LoadScreenName { get; set; }
-        }
-
-        private string loadScreenName;
+        private string loadingScreenName;
 
         public void Configure(IServiceConfig iConfig)
         {
             SceneServiceConfig config = iConfig as SceneServiceConfig;
-            if (!string.IsNullOrEmpty(config.LoadScreenName)) loadScreenName = config.LoadScreenName;
+            if (!string.IsNullOrEmpty(config.LoadingScreenName)) loadingScreenName = config.LoadingScreenName;
         }
 
         //public bool LoadSceneSynchronized(string sceneName) => LoadScene(sceneName, false);

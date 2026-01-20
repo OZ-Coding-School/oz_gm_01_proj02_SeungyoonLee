@@ -1,13 +1,16 @@
+using System;
 using UnityEngine;
 
 namespace LunarCube.GameManager
 {
+    [Serializable]
+    public class AssetServiceConfig : ServiceConfig<AssetService>
+    {
+
+    }
+
     public class AssetService : MonoBehaviour, IService
     {
-        private class AssetServiceConfig : ServiceConfig<AssetService>
-        {
-
-        }
 
         public void Configure(IServiceConfig iConfig)
         {
